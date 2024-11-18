@@ -41,7 +41,7 @@ jobs:
           jf c add artifactori --url=https://idani.jfrog.io --user=dudi --password=Passdudi12! --interactive=false
 
           # Scan the Docker image locally
-          jfrog docker scan idani.jfrog.io/docker-local/davidfirstpipline:latest
+          jf docker scan idani.jfrog.io/docker-local/davidfirstpipline:latest
           
       # Push the Docker image to Artifactory
       - name: Push Docker Image
