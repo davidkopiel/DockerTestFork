@@ -1,5 +1,3 @@
-name: Build, Scan, and Push Docker Image
-
 on:
   push:
     branches:
@@ -35,14 +33,16 @@ jobs:
           JFROG_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
         run: |
           # Install the JFrog CLI
-          curl -fL https://getcli.jfrog.io | sh && sudo mv jfrog /usr/local/bin/
-          
+          curl -fL https://getcli.jfrog.io | sh
+          sudo mv jfrog /usr/local/bin/
+          sudo chmod +x /usr/local/bin/jfrog
+
           # Configure JFrog CLI
-          jf c add artifactori --url=https://idani.jfrog.io --user=dudi --password=Passdudi12! --interactive=false
+          /usr/local/bin/jfrog c add artifactori --url=${{ env.JFROG_URL }} --user=${{ env.JFROG_USER }} --password=${{ env.JFROG_PASSWORD }} --interactive=false
 
           # Scan the Docker image locally
-          jf docker scan idani.jfrog.io/docker-local/davidfirstpipline:latest
-          
+          /usr/local/bin/jfrog docker scan idani.jfrog.io/docker-local/davidfirstpipline:latest
+
       # Push the Docker image to Artifactory
       - name: Push Docker Image
         run: |
