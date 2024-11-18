@@ -25,9 +25,9 @@ jobs:
       # Build the Docker image
       - name: Build Docker Image
         run: |
-          docker build -t https://idani.jfrog.io/docker-local/DavidFirstPipline:latest .
+          docker build -t idani.jfrog.io/docker-local/DavidFirstPipline:latest .
 
       # Push the Docker image to Artifactory
       - name: Push Docker Image
         run: |
-          docker push https://idani.jfrog.io/docker-local/DavidFirstPipline:latest
+          docker push idani.jfrog.io/docker-local/DavidFirstPipline:latest
