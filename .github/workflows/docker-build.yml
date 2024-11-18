@@ -1,9 +1,9 @@
-name: Build and Push Docker Image
+name: Build, Scan, and Push Docker Image
 
 on:
   push:
     branches:
-      - main  # Change this to the branch you want to trigger the action
+      - main  # Adjust this to the branch that you want to trigger the action
 
 jobs:
   build:
@@ -14,11 +14,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      # Log in to Docker Registry (Artifactory)
+      # Log in to Artifactory Docker Registry
       - name: Log in to Artifactory Docker Registry
         uses: docker/login-action@v1
         with:
-          registry: https://idani.jfrog.io/ui/login/
+          registry: idani.jfrog.io
           username: ${{ secrets.ARTIFACTORY_USERNAME }}
           password: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
@@ -27,6 +27,22 @@ jobs:
         run: |
           docker build -t idani.jfrog.io/docker-local/davidfirstpipline:latest .
 
+      # Scan the Docker image with JFrog Xray using JFrog CLI
+      - name: Scan Docker Image Locally with JFrog CLI
+        env:
+          JFROG_URL: 'https://idani.jfrog.io'
+          JFROG_USER: ${{ secrets.ARTIFACTORY_USERNAME }}
+          JFROG_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+        run: |
+          # Install the JFrog CLI
+          curl -fL https://getcli.jfrog.io | sh && sudo mv jfrog /usr/local/bin/
+          
+          # Configure JFrog CLI
+          jfrog rt c --url=$JFROG_URL --user=$JFROG_USER --password=$JFROG_PASSWORD --interactive=false
+
+          # Scan the Docker image locally
+          jfrog docker scan idani.jfrog.io/docker-local/davidfirstpipline:latest
+          
       # Push the Docker image to Artifactory
       - name: Push Docker Image
         run: |
