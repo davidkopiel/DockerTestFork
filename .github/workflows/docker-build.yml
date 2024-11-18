@@ -38,7 +38,7 @@ jobs:
           curl -fL https://getcli.jfrog.io | sh && sudo mv jfrog /usr/local/bin/
           
           # Configure JFrog CLI
-          jfrog rt c --url=$JFROG_URL --user=$JFROG_USER --password=$JFROG_PASSWORD --interactive=false
+          jfrog rt c --artifactory-url=$JFROG_URL --user=$JFROG_USER --password=$JFROG_PASSWORD --interactive=false
 
           # Scan the Docker image locally
           jfrog docker scan idani.jfrog.io/docker-local/davidfirstpipline:latest
