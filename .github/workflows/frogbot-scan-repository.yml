@@ -1,9 +1,15 @@
 name: "Frogbot Scan Repository"
 on:
+<<<<<<< HEAD
   workflow_dispatch:
   schedule:
     # The repository will be scanned once a day at 00:00 GMT.
     - cron: "0 0 * * *"
+=======
+  push:
+    branches:
+      - main  # Set to trigger on pushes to the main branch.
+>>>>>>> 7c70386 (Add Frogbot scan repository workflow and keep existing workflow)
 permissions:
   contents: write
   pull-requests: write
@@ -13,37 +19,42 @@ permissions:
 jobs:
   scan-repository:
     runs-on: ubuntu-latest
+<<<<<<< HEAD
     strategy:
       matrix:
         # The repository scanning will be triggered periodically on the following branches.
         branch: ["dev"]
+=======
+>>>>>>> 7c70386 (Add Frogbot scan repository workflow and keep existing workflow)
     steps:
       - uses: jfrog/frogbot@v2
         env:
           # [Mandatory]
           # JFrog platform URL
           JF_URL: ${{ secrets.JF_URL }}
-
           # [Mandatory if JF_USER and JF_PASSWORD are not provided]
           # JFrog access token with 'read' permissions on Xray service
           JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
-
           # [Mandatory if JF_ACCESS_TOKEN is not provided]
           # JFrog username with 'read' permissions for Xray. Must be provided with JF_PASSWORD
           # JF_USER: ${{ secrets.JF_USER }}
-
           # [Mandatory if JF_ACCESS_TOKEN is not provided]
           # JFrog password. Must be provided with JF_USER
           # JF_PASSWORD: ${{ secrets.JF_PASSWORD }}
-
           # [Mandatory]
           # The GitHub token is automatically generated for the job
           JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+<<<<<<< HEAD
 
           # [Mandatory]
           # The name of the branch on which Frogbot will perform the scan
           JF_GIT_BASE_BRANCH: ${{ matrix.branch }}
 
+=======
+          # [Mandatory]
+          # The name of the branch on which Frogbot will perform the scan
+          JF_GIT_BASE_BRANCH: main  # Set to the main branch.
+>>>>>>> 7c70386 (Add Frogbot scan repository workflow and keep existing workflow)
         # [Mandatory if using OIDC authentication protocol instead of JF_ACCESS_TOKEN]
         # Insert to oidc-provider-name the 'Provider Name' defined in the OIDC integration configured in the JPD
         # with:
