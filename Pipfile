@@ -1,0 +1,26 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pydash = "*"
+flask = {extras = ["async"], version = "*"}
+requests = "*"
+uwsgi = "*"
+dynaconf = "*"
+flask-json = "*"
+pandas = "*"
+google-cloud-bigquery = "*"
+google-cloud-logging = "*"
+db-dtypes = "*"
+gcsfs = "*"
+openai = "1.9.0"
+pyjwt = "*"
+Flask-Session = "*"
+Flask-Cors = "*"
+
+[dev-packages]
+pytest = "*"
+pylint = "*"
+yapf = "*"
