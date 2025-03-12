@@ -13,6 +13,16 @@ jobs:
       # Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Important for getting the commit hash
+
+      # Capture Git Information
+      - name: Capture Git Information
+        id: git_info
+        run: |
+          echo "::set-output name=branch::$(git rev-parse --abbrev-ref HEAD)"
+          echo "::set-output name=url::$(git config --get remote.origin.url)"
+          echo "::set-output name=commit::$(git rev-parse HEAD)"
 
       # Log in to Artifactory Docker Registry
       - name: Log in to Artifactory Docker Registry
@@ -22,26 +32,27 @@ jobs:
           username: ${{ secrets.ARTIFACTORY_USERNAME }}
           password: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
-      # Build the Docker image
+      # Build the Docker image with labels
       - name: Build Docker Image
         run: |
-          docker build -t idani.jfrog.io/docker-local/davidfirstpipline:latest .
+          docker build \
+            --label "git.branch=${{ steps.git_info.outputs.branch }}" \
+            --label "git.url=${{ steps.git_info.outputs.url }}" \
+            --label "git.commit=${{ steps.git_info.outputs.commit }}" \
+            -t idani.jfrog.io/docker-local/davidfirstpipline:latest .
 
       # Setup JFrog CLI
       - name: Setup JFrog CLI
         uses: jfrog/setup-jfrog-cli@v4
         with:
-          # JFrog platform url
           JF_URL: 'https://idani.jfrog.io'
-          # Basic authentication credentials
           JF_USER: ${{ secrets.ARTIFACTORY_USERNAME }}
           JF_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
       # Configure JFrog CLI
       - name: Configure JFrog CLI
         run: |
-          # Assuming your JFrog CLI should be configured for Artifactory
-          jf c add artifactori --url=https://idani.jfrog.io --user=${{ secrets.ARTIFACTORY_USERNAME }} --password=${{ secrets.ARTIFACTORY_PASSWORD }} --interactive=false
+          jf c add artifactory --url=https://idani.jfrog.io --user=${{ secrets.ARTIFACTORY_USERNAME }} --password=${{ secrets.ARTIFACTORY_PASSWORD }} --interactive=false
 
       # Scan the Docker image with JFrog CLI
       - name: Scan Docker Image Locally with JFrog CLI
