@@ -1,27 +1,53 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    JF_URL = credentials('jfrog-url')
-    JF_USER = credentials('jfrog-user')
-    JF_PASSWORD = credentials('jfrog-password')
-  }
-
-  stages {
-    stage('Clone Repo') {
-      steps {
-        checkout scm
-      }
+    triggers {
+        GenericTrigger(
+            genericVariables: [
+                [key: 'TRIGGER_KEY', value: '$.action'],
+                [key: 'JF_GIT_REPO', value: '$.repository.name'],
+                [key: 'JF_GIT_PULL_REQUEST_ID', value: '$.number'],
+                [key: 'JF_GIT_OWNER', value: '$.repository.owner.login']
+            ],
+            causeString: 'Triggered by GitHub PR event',
+            token: 'MyJobToken',
+            printContributedVariables: true,
+            printPostContent: true
+        )
     }
 
-    stage('Run Frogbot') {
-      steps {
-        sh '''
-          curl -fL https://releases.jfrog.io/artifactory/frogbot/v2/frogbot-linux-amd64 -o frogbot
-          chmod +x frogbot
-          ./frogbot scan-pull-request
-        '''
-      }
+    environment {
+        JF_GIT_PROVIDER = 'github'
+        JF_URL = credentials('JF_URL')
+        JF_ACCESS_TOKEN = credentials('JF_ACCESS_TOKEN')
+        JF_GIT_TOKEN = credentials('JF_GIT_TOKEN') // GitHub personal access token
     }
-  }
+
+    stages {
+        stage('Verify Trigger') {
+            steps {
+                script {
+                    if (env.TRIGGER_KEY != 'synchronize' && env.TRIGGER_KEY != 'opened') {
+                        error("Aborting: Not a relevant pull request event: ${env.TRIGGER_KEY}")
+                    }
+                }
+            }
+        }
+
+        stage('Download Frogbot') {
+            steps {
+                sh '''
+                    curl -fL https://releases.jfrog.io/artifactory/frogbot/v2/frogbot-linux-amd64 -o frogbot
+                    chmod +x frogbot
+                '''
+            }
+        }
+
+        stage('Scan Pull Request') {
+            steps {
+                sh './frogbot scan-pull-request'
+            }
+        }
+    }
 }
+
