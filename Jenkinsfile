@@ -9,10 +9,12 @@ pipeline {
                 [key: 'JF_GIT_PULL_REQUEST_ID', value: '$.number'],
                 [key: 'JF_GIT_OWNER', value: '$.repository.owner.login']
             ],
+
             causeString: 'Triggered by GitHub PR event',
             token: 'MyJobToken',
             printContributedVariables: true,
-            printPostContent: true
+            printPostContent: true,
+            silentResponse: false
         )
     }
 
@@ -37,7 +39,7 @@ pipeline {
         stage('Download Frogbot') {
             steps {
                 sh '''
-                    curl -fL https://releases.jfrog.io/artifactory/frogbot/v2/frogbot-linux-amd64 -o frogbot
+                    curl -fL https://releases.jfrog.io/artifactory/frogbot/v2/[RELEASE]/getFrogbot.sh -o frogbot
                     chmod +x frogbot
                 '''
             }
