@@ -9,10 +9,12 @@ pipeline {
                 [key: 'JF_GIT_PULL_REQUEST_ID', value: '$.number'],
                 [key: 'JF_GIT_OWNER', value: '$.repository.owner.login']
             ],
+
             causeString: 'Triggered by GitHub PR event',
             token: 'MyJobToken',
             printContributedVariables: true,
-            printPostContent: true
+            printPostContent: true,
+            silentResponse: false
         )
     }
 
