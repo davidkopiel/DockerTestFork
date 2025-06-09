@@ -1,0 +1,9 @@
+version: 1
+pipelines:
+  - project-name: my-npm-app
+    git:
+      provider: github
+      repo-owner: your-github-username
+      repository: frogbot-test
+    scan:
+      project-dir: .
