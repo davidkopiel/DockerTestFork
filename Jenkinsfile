@@ -25,13 +25,9 @@ pipeline {
     }
 
     stages {
-        stage('Verify Trigger') {
+        stage('Checkout') {
             steps {
-                script {
-                    if (env.TRIGGER_KEY != 'synchronize' && env.TRIGGER_KEY != 'opened') {
-                        error("Aborting: Not a relevant pull request event: ${env.TRIGGER_KEY}")
-                    }
-                }
+                checkout scm
             }
         }
 
@@ -39,13 +35,12 @@ pipeline {
             agent {
                 docker {
                     image 'python:3.11'
-                    args '-u root' // optional: if you need root to install curl
+                    args '-u root'
                 }
             }
             steps {
-                checkout scm  //
                 sh '''
-                    apt-get update && apt-get install -y curl
+                    apt-get update && apt-get install -y curl git
                     curl -fL https://releases.jfrog.io/artifactory/frogbot/v2/2.9.2/getFrogbot.sh -o getFrogbot.sh
                     chmod +x getFrogbot.sh
                     ./getFrogbot.sh
