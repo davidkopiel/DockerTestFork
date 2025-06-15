@@ -39,7 +39,7 @@ pipeline {
         stage('Download Frogbot') {
             steps {
                 sh '''
-                    curl -fL https://releases.jfrog.io/artifactory/frogbot/v2/[RELEASE]/getFrogbot.sh -o frogbot
+                    curl -fL https://releases.jfrog.io/artifactory/frogbot/v2/2.9.2/getFrogbot.sh -o frogbot
                     chmod +x frogbot
                 '''
             }
