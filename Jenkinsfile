@@ -47,14 +47,7 @@ pipeline {
 
         stage('Scan Pull Request') {
             steps {
-                script {
-                    docker.image('python:3.10').inside {
-                        sh '''
-                            pip install pipenv
-                            ./frogbot scan-pull-request
-                        '''
-                    }
-                }
+                sh './frogbot scan-pull-request'
             }
         }
     }
