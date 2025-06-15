@@ -25,6 +25,14 @@ pipeline {
     }
 
     stages {
+        stage('Debug Info') {
+            steps {
+                echo "🧩 GIT REPO: ${JF_GIT_REPO}"
+                echo "🧩 PR ID: ${JF_GIT_PULL_REQUEST_ID}"
+                echo "🧩 OWNER: ${JF_GIT_OWNER}"
+                echo "🧩 TRIGGER: ${TRIGGER_KEY}"
+            }
+        }
 
         stage('Scan Pull Request in Docker') {
             agent {
@@ -34,37 +42,25 @@ pipeline {
                 }
             }
             steps {
-                echo "🔍 Start Scan Pull Request in Docker"
-
                 sh '''
-                    echo "📂 Current directory: $(pwd)"
-                    echo "🧪 Checking if .git directory exists..."
-                    ls -la
-
-                    echo "📥 Installing dependencies..."
+                    set -e
                     apt-get update && apt-get install -y curl git
 
-                    echo "⬇️ Downloading Frogbot..."
+                    echo "📥 Cloning PR branch from GitHub..."
+                    git clone https://github.com/${JF_GIT_OWNER}/${JF_GIT_REPO}.git repo
+                    cd repo
+
+                    echo "📌 Checking out pull request branch..."
+                    git fetch origin pull/${JF_GIT_PULL_REQUEST_ID}/head:pr-branch
+                    git checkout pr-branch
+
+                    echo "🚀 Downloading Frogbot..."
                     curl -fL https://releases.jfrog.io/artifactory/frogbot/v2/2.9.2/getFrogbot.sh -o getFrogbot.sh
-
-                    echo "🔐 Making script executable..."
                     chmod +x getFrogbot.sh
-
-                    echo "🚀 Running Frogbot setup script..."
                     ./getFrogbot.sh
 
-                    echo "📁 Repo state after download:"
-                    ls -la
-
-                    echo "📦 Running Frogbot scan..."
-                    ./frogbot scan-pull-request || {
-                        echo '❌ Frogbot failed. Dumping debug info:'
-                        ls -la
-                        cat frogbot.log || true
-                        exit 1
-                    }
-
-                    echo "✅ Scan completed"
+                    echo "🔍 Running scan-pull-request..."
+                    ./frogbot scan-pull-request
                 '''
             }
         }
