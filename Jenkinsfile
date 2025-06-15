@@ -47,7 +47,10 @@ pipeline {
 
         stage('Scan Pull Request') {
             steps {
-                sh './frogbot scan-pull-request'
+                sh '''
+                    pip install pipenv
+                    ./frogbot scan-pull-request
+                    '''
             }
         }
     }
