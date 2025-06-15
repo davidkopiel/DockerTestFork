@@ -25,11 +25,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
 
         stage('Scan Pull Request in Docker') {
             agent {
@@ -39,12 +34,37 @@ pipeline {
                 }
             }
             steps {
+                echo "🔍 Start Scan Pull Request in Docker"
+
                 sh '''
+                    echo "📂 Current directory: $(pwd)"
+                    echo "🧪 Checking if .git directory exists..."
+                    ls -la
+
+                    echo "📥 Installing dependencies..."
                     apt-get update && apt-get install -y curl git
+
+                    echo "⬇️ Downloading Frogbot..."
                     curl -fL https://releases.jfrog.io/artifactory/frogbot/v2/2.9.2/getFrogbot.sh -o getFrogbot.sh
+
+                    echo "🔐 Making script executable..."
                     chmod +x getFrogbot.sh
+
+                    echo "🚀 Running Frogbot setup script..."
                     ./getFrogbot.sh
-                    ./frogbot scan-pull-request
+
+                    echo "📁 Repo state after download:"
+                    ls -la
+
+                    echo "📦 Running Frogbot scan..."
+                    ./frogbot scan-pull-request || {
+                        echo '❌ Frogbot failed. Dumping debug info:'
+                        ls -la
+                        cat frogbot.log || true
+                        exit 1
+                    }
+
+                    echo "✅ Scan completed"
                 '''
             }
         }
