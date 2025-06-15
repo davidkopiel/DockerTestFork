@@ -43,6 +43,7 @@ pipeline {
                 }
             }
             steps {
+                checkout scm  //
                 sh '''
                     apt-get update && apt-get install -y curl
                     curl -fL https://releases.jfrog.io/artifactory/frogbot/v2/2.9.2/getFrogbot.sh -o getFrogbot.sh
