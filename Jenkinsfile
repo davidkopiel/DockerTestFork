@@ -9,7 +9,6 @@ pipeline {
                 [key: 'JF_GIT_PULL_REQUEST_ID', value: '$.number'],
                 [key: 'JF_GIT_OWNER', value: '$.repository.owner.login']
             ],
-
             causeString: 'Triggered by GitHub PR event',
             token: 'MyJobToken',
             printContributedVariables: true,
@@ -22,7 +21,7 @@ pipeline {
         JF_GIT_PROVIDER = 'github'
         JF_URL = credentials('JF_URL')
         JF_ACCESS_TOKEN = credentials('JF_ACCESS_TOKEN')
-        JF_GIT_TOKEN = credentials('JF_GIT_TOKEN') // GitHub personal access token
+        JF_GIT_TOKEN = credentials('JF_GIT_TOKEN')
     }
 
     stages {
@@ -39,8 +38,9 @@ pipeline {
         stage('Download Frogbot') {
             steps {
                 sh '''
-                    curl -fL https://releases.jfrog.io/artifactory/frogbot/v2/2.9.2/getFrogbot.sh -o frogbot
-                    chmod +x frogbot
+                    curl -fL https://releases.jfrog.io/artifactory/frogbot/v2/2.9.2/getFrogbot.sh -o getFrogbot.sh
+                    chmod +x getFrogbot.sh
+                    ./getFrogbot.sh
                 '''
             }
         }
@@ -52,4 +52,3 @@ pipeline {
         }
     }
 }
-
