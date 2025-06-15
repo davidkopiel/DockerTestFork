@@ -35,19 +35,21 @@ pipeline {
             }
         }
 
-        stage('Download Frogbot') {
+        stage('Scan Pull Request in Docker') {
+            agent {
+                docker {
+                    image 'python:3.11'
+                    args '-u root' // optional: if you need root to install curl
+                }
+            }
             steps {
                 sh '''
+                    apt-get update && apt-get install -y curl
                     curl -fL https://releases.jfrog.io/artifactory/frogbot/v2/2.9.2/getFrogbot.sh -o getFrogbot.sh
                     chmod +x getFrogbot.sh
                     ./getFrogbot.sh
+                    ./frogbot scan-pull-request
                 '''
-            }
-        }
-
-        stage('Scan Pull Request') {
-            steps {
-                sh './frogbot scan-pull-request'
             }
         }
     }
